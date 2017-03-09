@@ -15,15 +15,38 @@ angular.module('app.identity')
 			$scope.onSuccess = function(googleUser) {
 				$scope.$apply(function() {
 					$scope.identity.signInFromGoogle(googleUser);
-					$scope.identity.loadMemberships().then(function(memberships){
-						if(memberships && memberships.length){
+					$scope.identity.loadMemberships().then(function(memberships) {
+
+						if (memberships && memberships.length) {
 							SelectedOrganizationId.set(memberships[0].organization.id);
-							kanbanizeLaneService.getLanes(memberships[0].organization.id).finally(function(){
+							kanbanizeLaneService.getLanes(memberships[0].organization.id).finally(function() {
+
+                                if ($state.previous) {
+                                    $log.debug('Redirecting to ' + $state.previous.name);
+
+                                    $state.go($state.previous.name, $state.previousParams);
+                                    $state.previous = null;
+                                    $state.previousParams = null;
+
+                                    return;
+                                }
+
 								$state.go('org.flow',{ orgId: memberships[0].organization.id });
 							});
-						}else{
-							$state.go('organizations');
+							return;
 						}
+
+                        if ($state.previous) {
+                            $log.debug('Redirecting to ' + $state.previous.name);
+
+                            $state.go($state.previous.name, $state.previousParams);
+                            $state.previous = null;
+                            $state.previousParams = null;
+
+                            return;
+                        }
+
+						$state.go('organizations');
 					});
 				});
 			};

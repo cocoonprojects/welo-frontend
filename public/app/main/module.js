@@ -17,7 +17,9 @@ angular.module('app', [
 		function($stateProvider, $urlRouterProvider) {
 			$urlRouterProvider.otherwise(function($injector) {
 				var $state = $injector.get("$state");
+
 				var SelectedOrganizationId = $injector.get("SelectedOrganizationId");
+
 				if(SelectedOrganizationId.get()){
 					$state.go("org.flow");
 				}else{

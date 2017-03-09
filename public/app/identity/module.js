@@ -12,17 +12,26 @@ angular.module('app.identity', ['ui.router'])
 	.run(['$rootScope', '$state', '$log', 'identity',
 		function($rootScope, $state, $log, identity) {
 			$rootScope.$on("$stateChangeStart",
-				function(event, toState) {
+				function(event, toState, toParams) {
+
 					if(toState.name === "sign-in" || toState.name === 'invitation') {
 						return;
 					}
+
 					if(identity.isAuthenticated()) {
 						$log.debug('Access to ' + toState.name + ' state granted: user authenticated');
 						return;
 					}
+
 					event.preventDefault();
+
 					$log.debug("Access to '" + toState.name + "' state denied: user not authenticated");
-					$state.go("sign-in");
+                    $log.debug("Saving previous state to '" + toState.name);
+
+                    $state.previous = toState;
+					$state.previousParams = toParams;
+
+                    $state.go("sign-in");
 				});
 		}
 	]);
