@@ -1,10 +1,10 @@
 <div class="navigation" >
     <md-tabs
-        data-ng-if="organizationId && selectedIndex>=0"
+        data-ng-if="organizationId && navigationBarTabs.selectedIndex>=0"
 
         md-dynamic-height
         md-no-ink-bar
-        md-selected="selectedIndex"
+        md-selected="navigationBarTabs.selectedIndex"
         md-stretch-tabs="always">
         	<md-tab  style="padding: 0px;" ui-sref="org.collaboration({ orgId: organizationId })" label="Items">
             </md-tab>
@@ -12,8 +12,8 @@
             </md-tab>
         	<md-tab style="padding: 0px;" ui-sref="org.flow">
                 <label layout="column"  layout-align="space-between center" >
-                  	<img data-ng-if="selectedIndex === 2" style="height: 18px; width: 18px; margin-bottom: -4px;" ng-src="img/liquido_icon_flow_v1.svg"/>
-                    <img data-ng-if="selectedIndex !== 2" style="height: 18px; width: 18px; margin-bottom: -4px;" ng-src="img/liquido_icon_flow_v1.svg"/>
+                  	<img data-ng-if="navigationBarTabs.selectedIndex === 2" style="height: 18px; width: 18px; margin-bottom: -4px;" ng-src="img/liquido_icon_flow_v1.svg"/>
+                    <img data-ng-if="navigationBarTabs.selectedIndex !== 2" style="height: 18px; width: 18px; margin-bottom: -4px;" ng-src="img/liquido_icon_flow_v1.svg"/>
                     <span>Flow</span>
                 </label>
         	</md-tab>

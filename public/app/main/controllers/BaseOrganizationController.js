@@ -74,20 +74,14 @@ angular.module('app')
                     });
                 }
 
-                $scope.selectedIndex = checkSelectedStateIndex($state.current.name);
-
+                $scope.navigationBarTabs = {
+                    selectedIndex: checkSelectedStateIndex($state.current.name)
+                };
                 $scope.$on('$stateChangeSuccess',
                     function(event, toState) {
-                        $scope.selectedIndex = checkSelectedStateIndex(toState.name);
+                        $scope.navigationBarTabs.selectedIndex = checkSelectedStateIndex(toState.name);
                     }
                 );
 
-                $scope.selectedIndex = checkSelectedStateIndex($state.current.name);
-
-                $scope.$on('$stateChangeSuccess',
-                    function(event, toState) {
-                        $scope.selectedIndex = checkSelectedStateIndex(toState.name);
-                    }
-                );
             }
 		]);
