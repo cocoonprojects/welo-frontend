@@ -20,10 +20,7 @@ angular.module('app', [
 					'responseError': function(rejection) {
 						if(rejection.status === 401){
 							alert("This page might be private. You could be able to view it after login. press ok to repeat your login");
-							var auth2 = gapi.auth2.getAuthInstance();
-							auth2.signOut().then(function () {
-								window.location.reload();
-							});
+							window.location.reload();
 						}else{
 							return $q.reject(rejection);
 						}

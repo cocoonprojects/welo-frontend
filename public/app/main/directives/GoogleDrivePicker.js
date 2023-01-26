@@ -1,22 +1,17 @@
 (function() {
 	"use strict";
 
-	var APIKEY_GOOGLE  = 'AIzaSyBx2sD5LLPis-w2k53aujeDuevtn5rWXdw';
-	var CLIENT_ID_GOOLE = '324494101979-kd155mfhheot9jjplga314139rl0p5pk';
 	var access_token;
 	var picker;
-	var GOOGLE_AUTH_INFO = {
-		'client_id': CLIENT_ID_GOOLE,
-		'scope': "https://www.googleapis.com/auth/drive.readonly",
-		'immediate': true
-	};
 
 	var showPicker = function(callback) {
 		var pickerCallback = function(data) {
-			if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
-				var file = data[google.picker.Response.DOCUMENTS][0],id = file[google.picker.Document.ID],request = gapi.client.drive.files.get({
-					fileId: id
-				});
+			if (data[google.picker.Response.ACTION] === google.picker.Action.PICKED) {
+
+				var
+					file = data[google.picker.Response.DOCUMENTS][0],
+					id = file[google.picker.Document.ID],
+					request = gapi.client.drive.files.get({fileId: id});
 
 				request.execute(callback(file));
 			}
@@ -24,7 +19,7 @@
 
 		picker = new google.picker.PickerBuilder().
 			addView(google.picker.ViewId.DOCS).
-			setAppId(CLIENT_ID_GOOLE).
+			setAppId(window.googleApi.CLIENT_ID).
 			setOAuthToken(access_token).
 			setCallback(pickerCallback).
 			setSize(1051,650).
@@ -39,12 +34,14 @@
 
 			var doAuth = function(){
 				var deferred = $q.defer();
-				gapi.load('auth', {'callback': function(){
-					window.gapi.auth.authorize(GOOGLE_AUTH_INFO,function(authResult){
-						access_token = authResult.access_token;
-						deferred.resolve(access_token);
-					});
-				}});
+
+				window.googleApi.authorize(function (requestToken) {
+					access_token = requestToken.access_token;
+					deferred.resolve(access_token);
+				});
+
+				window.googleApi.requestAccessToken();
+
 				return deferred.promise;
 			};
 
@@ -58,8 +55,8 @@
 
 					$scope.onFileSelect = $scope.onFileSelect || _.noop;
 
-					doAuth().then(function(){
-						domElement.addEventListener('click', function(){
+					domElement.addEventListener('click', function(){
+						doAuth().then(function(){
 							showPicker(function(file){
 								$scope.onFileSelect({
 									file:file

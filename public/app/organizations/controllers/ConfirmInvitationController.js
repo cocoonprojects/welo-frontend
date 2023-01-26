@@ -7,6 +7,7 @@ angular.module('app')
 		'SelectedOrganizationId',
 		'memberService',
 		'InvitationData',
+		'identity',
 		function (
 			$scope,
 			$stateParams,
@@ -14,24 +15,25 @@ angular.module('app')
 			$mdDialog,
 			SelectedOrganizationId,
 			memberService,
-			InvitationData) {
+			InvitationData,
+			identity) {
 
-				var onSuccess = function(googleUser) {
+				var onSigningIn = function(accessToken) {
 					$scope.$apply(function() {
-						var profile = googleUser.getBasicProfile();
-						var email = profile.getEmail();
+						identity.getUser(accessToken).then(function(user) {
+							var email = user.data.email;
 
-						if(email.toLowerCase() === InvitationData.guestEmail.toLowerCase()){
-							var confirm = $mdDialog.confirm({
-						        title: 'Confirm',
-						        textContent: 'Do You want to Join ' + InvitationData.orgName + '?',
-						        ok: 'Confirm',
-								cancel: 'Cancel'
-							});
+							if(email.toLowerCase() === InvitationData.guestEmail.toLowerCase()){
+								var confirm = $mdDialog.confirm({
+									title: 'Confirm',
+									textContent: 'Do You want to Join ' + InvitationData.orgName + '?',
+									ok: 'Confirm',
+									cancel: 'Cancel'
+								});
 
-							$mdDialog.show(confirm).then(function(result){
-								if(result){
-									$scope.identity.signInFromGoogle(googleUser).then(function(response) {
+								$mdDialog.show(confirm).then(function(result){
+									if(result){
+										$scope.identity.signIn(accessToken, user.data);
 
 										SelectedOrganizationId.set(InvitationData.orgId);
 										memberService.joinOrganizationAfterInvite({ id: InvitationData.orgId }, function(){
@@ -42,7 +44,6 @@ angular.module('app')
 											console.log("ERROR!!!!!");
 											console.log(JSON.stringify(error));
 
-											
 											var message = "Generic Error during server communication. Reload the page and retry";
 											var alert = $mdDialog.alert({
 												title: 'Error',
@@ -51,38 +52,36 @@ angular.module('app')
 											});
 											$mdDialog.show(alert);
 										});
-
-									}, function(error) {
-										console.log("ERROR!!!!!");
-										console.log(JSON.stringify(error));
-
-										var message = "Generic Error during server communication. Reload the page and retry";
-										var alert = $mdDialog.alert({
-											title: 'Error',
-											textContent: message,
-											ok: 'Close'
-										});
-										$mdDialog.show(alert);
-									});
-								}
-							});
-						}else{
-							var message = "Your email (" + email + ") it's not the same used to invite you (" + InvitationData.guestEmail + "). Please login with a different user";
-							var alert = $mdDialog.alert({
-						        title: 'Error',
-						        textContent: message,
-						        ok: 'Close'
-							});
-							$mdDialog.show(alert);
-						}
+									}
+								});
+							}else{
+								var message = "Your email (" + email + ") it's not the same used to invite you (" + InvitationData.guestEmail + "). Please login with a different user";
+								var alert = $mdDialog.alert({
+									title: 'Error',
+									textContent: message,
+									ok: 'Close'
+								});
+								$mdDialog.show(alert);
+							}
+						});
 					});
 				};
 
-				gapi.signin2.render('googleSignIn', {
-					'scope': 'https://www.googleapis.com/auth/drive.readonly',
-					'width': 230,
-					'longtitle': true,
-					'theme': 'dark',
-					'onsuccess': onSuccess
+				google.accounts.id.initialize({
+					client_id: window.googleApi.CLIENT_ID,
+					callback: function(response) {
+						onSigningIn(response.credential);
+					}
 				});
+
+				google.accounts.id.renderButton(
+					document.getElementById('googleSignIn'),
+					{
+						'width': 230,
+						'type': 'standard',
+						'theme': 'filled_blue',
+						'size': 'large',
+						'shape': 'pill'
+					}
+				);
 		}]);

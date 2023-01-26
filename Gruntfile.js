@@ -137,10 +137,10 @@ module.exports = function(grunt) {
 		},
 		shell: {
 	        deploy_staging: {
-	            command: 'rsync ./build/* cocoon@10.250.2.235:/var/www/vhosts/welo-stage/public --rsh ssh -r --verbose'
+	            command: 'rsync ./build/* cocoon-test:/var/www/vhosts/welo-prod/public --rsh ssh -r --verbose --rsync-path="sudo rsync"'
 	        },
 			deploy_prod: {
-				command: 'rsync ./build/* cocoon@10.250.2.235:/var/www/vhosts/welo-prod/public --rsh ssh -r --verbose'
+				command: 'rsync ./build/* cocoon:/var/www/vhosts/welo-prod/public --rsh ssh -r --verbose --rsync-path="sudo rsync"'
 			}
 	    }
 	});
